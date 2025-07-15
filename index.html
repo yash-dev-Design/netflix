@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix</title>
+    <link rel="shortcut icon" href="netflix.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Netflix+Sans:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        /* Basic Reset & Body Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        *::selection {
+            background-color: #e50914;
+            color: #e5e5e5;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            background-color: #141414;
+            color: #ffffff;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Page Transitions */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 5px #e50914;
+            }
+
+            50% {
+                box-shadow: 0 0 20px #e50914, 0 0 30px #e50914;
+            }
+
+            100% {
+                box-shadow: 0 0 5px #e50914;
+            }
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 10%, transparent);
+            z-index: 1000;
+            transition: all 0.4s ease;
+            padding: 0 4%;
+        }
+
+        .header.scrolled {
+            background-color: #141414;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .netflix-logo {
+            color: #e50914;
+            font-size: 30px;
+            font-weight: bold;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .netflix-logo:hover {
+            transform: scale(1.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-link {
+            color: #e5e5e5;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #ffffff;
+            background-color: rgba(229, 9, 20, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #ffffff;
+            font-size: 14px;
+            width: 0;
+            /* Hidden initially */
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .search-input.active {
+            width: 200px;
+            /* Visible when active */
+            opacity: 1;
+            visibility: visible;
+            padding-right: 40px;
+            /* Make space for icon */
+        }
+
+        .search-icon {
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+            position: absolute;
+            right: 0;
+            color: #e5e5e5;
+        }
+
+        .search-container.active .search-icon {
+            position: relative;
+            right: auto;
+            margin-left: -35px;
+            /* Adjust if needed */
+        }
+
+        .search-icon:hover {
+            color: #e50914;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.2);
+        }
+
+        .notifications {
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .notifications:hover {
+            color: #e50914;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.2);
+        }
+
+        .profile-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            position: relative;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            margin-right: -30px;
+        }
+
+        .profile-menu:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-menu:hover .profile-avatar {
+            transform: scale(1.1);
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-menu:hover .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #141414;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px 0;
+            min-width: 150px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-dropdown a {
+            display: block;
+            color: #e5e5e5;
+            text-decoration: none;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown a:hover {
+            background-color: #333;
+            color: #ffffff;
+        }
+
+        .username-display {
+            font-size: 12px;
+            color: #b3b3b3;
+        }
+
+        /* Authentication Pages */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+                url("https://d3ghupt9z9s6o0.cloudfront.net/app/uploads/2017/04/13100509/Netflix-Background-1460x821.jpg") center / cover;
+        }
+
+        .auth-form {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        .auth-form h2 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2rem;
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e5e5e5;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #333;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #e50914;
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.3);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #e50914;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .auth-btn:hover {
+            background-color: #f40612;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+        }
+
+        .auth-switch {
+            text-align: center;
+            color: #b3b3b3;
+        }
+
+        .auth-switch a {
+            color: #e50914;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .auth-switch a:hover {
+            color: #f40612;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #e50914;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Hero Section - Video Carousel */
+        .hero-carousel {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+            /* Fallback for video loading */
+        }
+
+        .carousel-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .carousel-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            /* Use flexbox for content positioning */
+            align-items: center;
+            padding: 0 4%;
+            z-index: 1;
+            /* Ensure content is above video but below overlay */
+        }
+
+        .carousel-item.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .background-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            /* Place video behind overlay */
+        }
+
+        .hero-content {
+            max-width: 500px;
+            z-index: 2;
+            position: relative;
+            /* Ensure content is positioned correctly */
+            color: #ffffff;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.45);
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            line-height: 1.3;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.45);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-play {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .btn-play:hover {
+            background-color: rgba(255, 255, 255, 0.75);
+            transform: scale(1.05);
+        }
+
+        .btn-info {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: #ffffff;
+        }
+
+        .btn-info:hover {
+            background-color: rgba(109, 109, 110, 0.4);
+            transform: scale(1.05);
+        }
+
+        .hero-fade {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 7.4rem;
+            background: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.5), #141414);
+            z-index: 3;
+            /* Ensure fade is on top of video and content */
+        }
+
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 15px 10px;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 4;
+            /* Ensure controls are on top */
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .carousel-control:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .carousel-control.prev {
+            left: 20px;
+        }
+
+        .carousel-control.next {
+            right: 20px;
+        }
+
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            padding: 0 4%;
+            margin-top: -100px;
+        }
+
+        /* Content Rows */
+        .content-row {
+            margin-bottom: 60px;
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .row-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #e5e5e5;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .row-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 100%;
+            background-color: #e50914;
+            border-radius: 2px;
+        }
+
+        .row-container {
+            position: relative;
+        }
+
+        .row-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 10px 0;
+        }
+
+        .row-content.horizontal-scroll {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .row-content.horizontal-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .row-content.horizontal-scroll .content-card {
+            min-width: 200px;
+            flex-shrink: 0;
+        }
+
+        .content-card {
+            height: 300px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+        }
+
+        .content-card:hover {
+            transform: scale(1.08) translateY(-10px);
+            z-index: 10;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(229, 9, 20, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .content-card:hover::before {
+            opacity: 1;
+        }
+
+        .content-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+
+        .content-card:hover img {
+            transform: scale(1.1);
+            filter: brightness(1.2) contrast(1.1);
+        }
+
+        .card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.95));
+            padding: 30px 15px 15px;
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+        }
+
+        .content-card:hover .card-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .card-details {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: #b3b3b3;
+            margin-bottom: 10px;
+        }
+
+        .match {
+            color: #46d369;
+            font-weight: 600;
+        }
+
+        .rating {
+            border: 1px solid #808080;
+            padding: 2px 6px;
+            font-size: 10px;
+            border-radius: 2px;
+        }
+
+        .duration {
+            color: #d2d2d2;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .card-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #ffffff;
+        }
+
+        .card-btn:hover {
+            background: #e50914;
+            transform: scale(1.1);
+        }
+
+        /* Add Movie Card Section */
+        .add-movie-section {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 40px;
+            margin: 60px 0;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .add-movie-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .add-movie-form .form-group {
+            margin-bottom: 0;
+            /* Override default form-group margin */
+        }
+
+        /* Scroll Buttons */
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .row-container:hover .scroll-btn {
+            opacity: 1;
+        }
+
+        .scroll-btn:hover {
+            background-color: #e50914;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .scroll-btn-left {
+            left: -25px;
+        }
+
+        .scroll-btn-right {
+            right: -25px;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            padding: 60px 4% 30px;
+            margin-top: 80px;
+            border-top: 1px solid #333;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-column h4 {
+            color: #e50914;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: #808080;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            padding: 4px 0;
+        }
+
+        .footer-column a:hover {
+            color: #ffffff;
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 30px;
+            text-align: center;
+        }
+
+        .footer-bottom p {
+            color: #808080;
+            font-size: 17px;
+        }
+
+        .footer-bottom a {
+            text-decoration: none;
+            color: whitesmoke;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .row-content {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-description {
+                font-size: 1rem;
+            }
+
+            .row-content {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .content-card {
+                height: 225px;
+            }
+
+            .footer-links {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main-content {
+                padding: 0 2%;
+            }
+
+            .header {
+                padding: 0 2%;
+            }
+
+            .hero-carousel {
+                padding: 0 2%;
+            }
+
+            .recommended-section {
+                padding: 40px 2%;
+            }
+
+            .carousel-control {
+                padding: 10px 5px;
+                font-size: 1.5rem;
+            }
+
+            .carousel-control.prev {
+                left: 10px;
+            }
+
+            .carousel-control.next {
+                right: 10px;
+            }
+
+            .add-movie-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .netflix-logo {
+                font-size: 20px;
+                margin-right: 20px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+
+            .row-content {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .content-card {
+                height: 180px;
+            }
+
+            .auth-form {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .add-movie-section {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #141414;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-top: 3px solid #e50914;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 0px;
+            background-color: #e50914;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(-30px);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Authentication Pages -->
+    <div id="signin-page" class="page" style="background-color: black;">
+        <div class="auth-container">
+            <form class="auth-form" id="signin-form" data-aos="fade-up">
+                <h2>Sign In</h2>
+                <div class="form-group">
+                    <label for="signin-username">Username</label>
+                    <input type="text" id="signin-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="signin-password">Password</label>
+                    <input type="password" id="signin-password" required>
+                </div>
+                <button type="submit" class="auth-btn">Sign In</button>
+                <div class="auth-switch">
+                    Don't have an account? <a href="#" onclick="showPage('signup-page')">Sign up</a>
+                </div>
+                <div id="signin-error" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="signup-page" class="page" style="background: black;">
+        <div class="auth-container">
+            <form class="auth-form" id="signup-form" data-aos="fade-up">
+                <h2>Sign Up</h2>
+                <div class="form-group">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" required>
+                </div>
+                <button type="submit" class="auth-btn">Sign Up</button>
+                <div class="auth-switch">
+                    Already have an account? <a href="#" onclick="showPage('signin-page')">Sign in</a>
+                </div>
+                <div id="signup-error" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="page">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="netflix-logo" onclick="showSection('home')">NETFLIX</div>
+                    <nav class="nav-menu">
+                        <a href="#" class="nav-link active" onclick="showSection('home')">Home</a>
+                        <a href="#" class="nav-link" onclick="showSection('trending')">Trending</a>
+                        <a href="#" class="nav-link" onclick="showSection('originals')">Originals</a>
+                        <a href="#" class="nav-link" onclick="showSection('movies')">Movies</a>
+                        <a href="#" class="nav-link" onclick="showSection('series')">TV Series</a>
+                        <a href="#" class="nav-link" onclick="showSection('documentaries')">Documentaries</a>
+                        <a href="#" class="nav-link" onclick="showSection('kids')">Kids</a>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <div class="search-container">
+                        <input type="text" id="search-input" class="search-input" placeholder="Search movies...">
+                        <div class="search-icon"><i class="fa fa-search" aria-hidden="true"></i></div>
+                    </div>
+                    <div class="notifications"><i class="fa fa-bell" aria-hidden="true"></i></div>
+                    <div class="profile-menu" onclick="toggleProfileDropdown()">
+                        <img src="https://placehold.co/32x32/FF0000/FFFFFF?text=User" alt="Profile"
+                            class="profile-avatar">
+                        <div class="username-display" id="username-display"></div>
+                        <div class="dropdown-arrow">▼</div>
+                        <div class="profile-dropdown" id="profile-dropdown">
+                            <a href="#" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Home Section -->
+        <div id="home-section" class="section active">
+            <!-- Hero Section - Video Carousel -->
+            <section class="hero-carousel" data-aos="fade-in">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <video autoplay loop muted playsinline class="background-video">
+                            <source src="stranger-things.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="hero-content" data-aos="fade-right" data-aos-delay="500" style="margin-left: 20px;">
+                            <h1 class="hero-title">Stranger Things</h1>
+                            <p class="hero-description">
+                                Enter the mysterious town of Hawkins, where a young boy vanishes into thin air.
+                                Secrets unravel as friends face supernatural forces and a girl with telekinetic powers.
+                            </p>
+                            <div class="hero-buttons">
+                                <button class="btn btn-play">
+                                    <span class="play-icon">▶</span>
+                                    Play
+                                </button>
+                                <button class="btn btn-info">
+                                    <span class="info-icon">ℹ</span>
+                                    More Info
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <video autoplay loop muted playsinline class="background-video">
+                            <source
+                                src="money-heist.mp4"
+                                type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="hero-content" data-aos="fade-right" data-aos-delay="500" style="margin-left: 20px;">
+                            <h1 class="hero-title">Money Heist</h1>
+                            <p class="hero-description">
+                                A criminal mastermind plans the biggest heist in history.
+                                Eight skilled thieves take hostages inside the Royal Mint of Spain.
+                                Tensions rise as law enforcement closes in and secrets unfold.
+                            </p>
+                            <div class="hero-buttons">
+                                <button class="btn btn-play">
+                                    <span class="play-icon">▶</span>
+                                    Play
+                                </button>
+                                <button class="btn btn-info">
+                                    <span class="info-icon">ℹ</span>
+                                    More Info
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <video autoplay loop muted playsinline class="background-video">
+                            <source
+                                src="kim.mp4"
+                                type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="hero-content" data-aos="fade-right" data-aos-delay="500" style="margin-left: 20px;">
+                            <h1 class="hero-title">What's Wrong With Secretary Kim</h1>
+                            <p class="hero-description">
+                                A narcissistic CEO's world is shaken when his loyal secretary decides to quit.
+                                As he tries to make her stay, buried pasts and unexpected feelings emerge.
+                                A charming mix of romance, comedy, and heartfelt moments.
+                            </p>
+                            <div class="hero-buttons">
+                                <button class="btn btn-play">
+                                    <span class="play-icon">▶</span>
+                                    Play
+                                </button>
+                                <button class="btn btn-info">
+                                    <span class="info-icon">ℹ</span>
+                                    More Info
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control prev" onclick="changeSlide(-1)">❮</button>
+                <button class="carousel-control next" onclick="changeSlide(1)">❯</button>
+                <div class="hero-fade"></div>
+            </section>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Trending Now -->
+                <section class="content-row" data-aos="fade-up">
+                    <h2 class="row-title">Trending Now</h2>
+                    <div class="row-container">
+                        <div class="row-content horizontal-scroll" id="trending-row">
+                            <!-- Trending content cards will be populated by JavaScript -->
+                        </div>
+                        <button class="scroll-btn scroll-btn-right"
+                            onclick="scrollRowSmooth('trending-row', 'right')">❯</button>
+                        <button class="scroll-btn scroll-btn-left"
+                            onclick="scrollRowSmooth('trending-row', 'left')">❮</button>
+                    </div>
+                </section>
+                <!-- Netflix Originals -->
+                <section class="content-row" data-aos="fade-up" data-aos-delay="100">
+                    <h2 class="row-title">Netflix Originals</h2>
+                    <div class="row-container">
+                        <div class="row-content" id="originals-row">
+                            <!-- Originals content cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Popular Movies -->
+                <section class="content-row" data-aos="fade-up" data-aos-delay="200">
+                    <h2 class="row-title">Popular Movies</h2>
+                    <div class="row-container">
+                        <div class="row-content" id="movies-row">
+                            <!-- Movies content cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Add New Movie Card Section -->
+                <!-- <section class="add-movie-section" data-aos="fade-up" data-aos-delay="300">
+                    <h2 class="row-title">Add Your Own Movie Card</h2>
+                    <form id="add-movie-form" class="add-movie-form">
+                        <div class="form-group">
+                            <label for="movie-title">Title</label>
+                            <input type="text" id="movie-title" placeholder="e.g., The Great Movie" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="movie-image">Image URL</label>
+                            <input type="url" id="movie-image" placeholder="e.g., https://example.com/movie.jpg"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="movie-match">Match (%)</label>
+                            <input type="number" id="movie-match" min="0" max="100" value="90" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="movie-rating">Rating</label>
+                            <input type="text" id="movie-rating" placeholder="e.g., PG-13" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="movie-duration">Duration</label>
+                            <input type="text" id="movie-duration" placeholder="e.g., 2h 15m or 3 Seasons" required>
+                        </div>
+                        <button type="submit" class="auth-btn">Add Movie</button>
+                    </form>
+                </section> -->
+            </main>
+        </div>
+
+        <!-- Individual Sections -->
+        <div id="trending-section" class="section">
+            <div style="padding-top: 200px;">
+                <main class="main-content">
+                    <section class="content-row" data-aos="fade-up">
+                        <h2 class="row-title">All Trending Content</h2>
+                        <div class="row-container">
+                            <div class="row-content" id="all-trending-row">
+                                <!-- All trending content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+
+        <div id="originals-section" class="section">
+            <div style="padding-top: 200px;">
+                <main class="main-content">
+                    <section class="content-row" data-aos="fade-up">
+                        <h2 class="row-title">Netflix Originals Collection</h2>
+                        <div class="row-container">
+                            <div class="row-content" id="all-originals-row">
+                                <!-- All originals content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+
+        <div id="movies-section" class="section">
+            <div style="padding-top: 200px;">
+                <main class="main-content">
+                    <section class="content-row" data-aos="fade-up">
+                        <h2 class="row-title">Popular Movies Collection</h2>
+                        <div class="row-container">
+                            <div class="row-content" id="all-movies-row">
+                                <!-- All movies content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+
+        <div id="series-section" class="section">
+            <div style="padding-top: 200px;">
+                <main class="main-content">
+                    <section class="content-row" data-aos="fade-up">
+                        <h2 class="row-title">TV Series Collection</h2>
+                        <div class="row-container">
+                            <div class="row-content" id="all-series-row">
+                                <!-- All series content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+
+        <div id="documentaries-section" class="section">
+            <div style="padding-top: 200px;">
+                <main class="main-content">
+                    <section class="content-row" data-aos="fade-up">
+                        <h2 class="row-title">Documentaries Collection</h2>
+                        <div class="row-container">
+                            <div class="row-content" id="all-documentaries-row">
+                                <!-- All documentaries content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+
+        <div id="kids-section" class="section">
+            <div style="padding-top: 200px;">
+                <main class="main-content">
+                    <section class="content-row" data-aos="fade-up">
+                        <h2 class="row-title">Kids & Family Collection</h2>
+                        <div class="row-container">
+                            <div class="row-content" id="all-kids-row">
+                                <!-- All kids content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <div class="footer-column" data-aos="fade-up" data-aos-delay="100">
+                        <h4>Company</h4>
+                        <a href="about-netflix.html">About Netflix</a>
+                        <a href="investor-relations.html">Investor Relations</a>
+                        <a href="Jobs.html">Jobs</a>
+                        <a href="press.html">Press</a>
+                    </div>
+                    <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
+                        <h4>Support</h4>
+                        <a href="help-center.html">Help Center</a>
+                        <a href="contact-us.html">Contact Us</a>
+                        <a href="faq.html">FAQ</a>
+                        <a href="speed-test.html">Speed Test</a>
+                    </div>
+                    <div class="footer-column" data-aos="fade-up" data-aos-delay="300">
+                        <h4>Legal</h4>
+                        <a href="privacy-policy.html">Privacy Policy</a>
+                        <a href="terms-of-service.html">Terms of Service</a>
+                        <a href="cookie-preferences.html">Cookie Preferences</a>
+                        <a href="legal-notices.html">Legal Notices</a>
+                    </div>
+                    <div class="footer-column" data-aos="fade-up" data-aos-delay="400">
+                        <h4>Account</h4>
+                        <a href="manage-account.html">Manage Account</a>
+                        <a href="ways-to-watch.html">Ways to Watch</a>
+                        <a href="redeem-gift-cards.html">Redeem Gift Cards</a>
+                        <a href="buy-gift-cards.html">Buy Gift Cards</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Netflix <b>|</b> All Rights Reserved <b>|</b> Made With ❤ By <a
+                            href="https://royz-portfolio.netlify.app/" target="_blank" title="author website">This
+                            Guy</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Hidden div to store movie data in HTML format -->
+    <div id="movie-data-html" style="display: none;">
+        <div data-category="trending">
+            <div data-title="The Witcher"
+                data-image="https://i.pinimg.com/736x/39/e3/36/39e336d9e9065737f707ed511d73cef5.jpg" data-match="98%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="Ozark"
+                data-image="https://i.pinimg.com/1200x/51/aa/47/51aa479dad8736d622d35c904f16e371.jpg" data-match="95%"
+                data-rating="TV-MA" data-duration="4 Seasons"></div>
+            <div data-title="Money Heist"
+                data-image="https://i.pinimg.com/736x/11/99/e7/1199e7af4428e98189efd90b454923f5.jpg" data-match="92%"
+                data-rating="TV-MA" data-duration="5 Seasons"></div>
+            <div data-title="Dark" data-image="https://i.pinimg.com/1200x/3f/1c/ee/3f1cee950776c993b156ad3041e98a2a.jpg"
+                data-match="89%" data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="Bridgerton"
+                data-image="https://i.pinimg.com/1200x/37/5e/31/375e31f84ebb61551836ab4159d2a993.jpg" data-match="87%"
+                data-rating="TV-MA" data-duration="2 Seasons"></div>
+            <div data-title="The Crown"
+                data-image="https://i.pinimg.com/736x/10/fb/be/10fbbe0bf276b7b74f1c9a1cc84ee92e.jpg" data-match="94%"
+                data-rating="TV-MA" data-duration="6 Seasons"></div>
+            <div data-title="Lucifer"
+                data-image="https://i.pinimg.com/1200x/ce/88/ca/ce88ca8a8336b07aff0aa81ce0c46e12.jpg" data-match="95%"
+                data-rating="TV-14" data-duration="6 Seasons"></div>
+            <div data-title="Narcos"
+                data-image="https://i.pinimg.com/1200x/e8/5a/85/e85a85d57bcbd412ae5530d3eade8d50.jpg" data-match="93%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="The Queen's Gambit"
+                data-image="https://i.pinimg.com/1200x/1e/d1/f6/1ed1f6240f0aa855f732b08339427092.jpg" data-match="91%"
+                data-rating="TV-MA" data-duration="Limited Series"></div>
+            <div data-title="Breaking Bad"
+                data-image="https://i.pinimg.com/1200x/37/62/75/37627587496965efcc0ae42ac9dff525.jpg" data-match="97%"
+                data-rating="TV-MA" data-duration="5 Seasons"></div>
+            <div data-title="Wednesday"
+                data-image="https://i.pinimg.com/736x/6a/87/64/6a8764c96d1d00bd76ee1f58f788e480.jpg" data-match="93%"
+                data-rating="TV-14" data-duration="1 Season"></div>
+            <div data-title="Squid Game"
+                data-image="https://i.pinimg.com/736x/fe/02/c0/fe02c07a7de562b6ea8e285235ebb7a9.jpg" data-match="96%"
+                data-rating="TV-MA" data-duration="1 Season"></div>
+            <div data-title="Euphoria"
+                data-image="https://i.pinimg.com/736x/f0/47/15/f04715b4a5d665eb4d2878bd21c14ec6.jpg" data-match="88%"
+                data-rating="TV-MA" data-duration="2 Seasons"></div>
+            <div data-title="The Mandalorian"
+                data-image="https://i.pinimg.com/1200x/14/b4/4c/14b44c15de8166018427efbd31f9b30e.jpg" data-match="92%"
+                data-rating="TV-14" data-duration="3 Seasons"></div>
+            <div data-title="House of the Dragon"
+                data-image="https://i.pinimg.com/736x/11/95/39/119539d066f585e973f334071d1424d9.jpg" data-match="90%"
+                data-rating="TV-MA" data-duration="1 Season"></div>
+            <div data-title="The Boys"
+                data-image="https://i.pinimg.com/736x/db/c9/07/dbc907fc07fac0dbc0051a0f7ab7140f.jpg" data-match="94%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="Peaky Blinders"
+                data-image="https://i.pinimg.com/1200x/d7/b4/2c/d7b42c6f97ccf42d764e9a0cc6cf8504.jpg" data-match="91%"
+                data-rating="TV-MA" data-duration="6 Seasons"></div>
+            <div data-title="The Umbrella Academy"
+                data-image="https://i.pinimg.com/736x/97/64/21/976421330089a68dcbb201a3025fd4b1.jpg" data-match="86%"
+                data-rating="TV-14" data-duration="3 Seasons"></div>
+            <div data-title="Cobra Kai"
+                data-image="https://i.pinimg.com/1200x/6c/4d/90/6c4d90f1f19cb9ac369ac9dc6510060c.jpg" data-match="89%"
+                data-rating="TV-14" data-duration="5 Seasons"></div>
+            <div data-title="The Office"
+                data-image="https://i.pinimg.com/736x/72/b6/d7/72b6d7eddd670aaa9fbc4d1466eba9ee.jpg" data-match="93%"
+                data-rating="TV-14" data-duration="9 Seasons"></div>
+        </div>
+        <div data-category="originals">
+            <div data-title="House of Cards"
+                data-image="https://i.pinimg.com/1200x/59/30/40/593040cdf873b854ac5022e4265542ed.jpg" data-match="91%"
+                data-rating="TV-MA" data-duration="6 Seasons"></div>
+            <div data-title="Orange Is the New Black"
+                data-image="https://i.pinimg.com/736x/2c/36/ab/2c36abb4b07995b52d2fe438e7cc5725.jpg" data-match="88%"
+                data-rating="TV-MA" data-duration="7 Seasons"></div>
+            <div data-title="Mindhunter"
+                data-image="https://i.pinimg.com/1200x/de/ab/24/deab2416998776e5fb591b1bf564698d.jpg" data-match="90%"
+                data-rating="TV-MA" data-duration="2 Seasons"></div>
+            <div data-title="The Umbrella Academy"
+                data-image="https://i.pinimg.com/736x/97/64/21/976421330089a68dcbb201a3025fd4b1.jpg" data-match="86%"
+                data-rating="TV-14" data-duration="3 Seasons"></div>
+            <div data-title="Black Mirror"
+                data-image="https://i.pinimg.com/736x/43/ff/d6/43ffd663f2e6f9c818b284e655a372d1.jpg" data-match="92%"
+                data-rating="TV-MA" data-duration="5 Seasons"></div>
+            <div data-title="Locke & Key"
+                data-image="https://i.pinimg.com/736x/5c/49/e3/5c49e32d7e16bcfef949db0555cff78f.jpg" data-match="89%"
+                data-rating="TV-14" data-duration="3 Seasons"></div>
+            <div data-title="13 Reasons Why"
+                data-image="https://i.pinimg.com/1200x/ac/30/17/ac3017240e99e286076498483c99fab3.jpg" data-match="89%"
+                data-rating="TV-MA" data-duration="4 Seasons"></div>
+            <div data-title="The Sandman"
+                data-image="https://i.pinimg.com/736x/cd/be/da/cdbeda06fd98ba1267919cdd1411e001.jpg" data-match="90%"
+                data-rating="TV-MA" data-duration="1 Season"></div>
+            <div data-title="Shadow and Bone"
+                data-image="https://i.pinimg.com/736x/8e/29/3b/8e293b7bf1641ace04d35ea4a1761a3d.jpg" data-match="87%"
+                data-rating="TV-14" data-duration="2 Seasons"></div>
+            <div data-title="Sex Education"
+                data-image="https://i.pinimg.com/1200x/03/90/2d/03902d02643f0c44e576da1237487bf8.jpg" data-match="92%"
+                data-rating="TV-MA" data-duration="4 Seasons"></div>
+            <div data-title="The Lincoln Lawyer"
+                data-image="https://i.pinimg.com/1200x/4e/c8/c0/4ec8c04e7eea1e77189f5550e91ff1bd.jpg" data-match="88%"
+                data-rating="TV-MA" data-duration="2 Seasons"></div>
+            <div data-title="Stranger Things"
+                data-image="https://i.pinimg.com/736x/b0/96/b1/b096b14183aaa7cf7b5180531b3271de.jpg" data-match="95%"
+                data-rating="TV-14" data-duration="4 Seasons"></div>
+            <div data-title="The Witcher"
+                data-image="https://i.pinimg.com/736x/39/e3/36/39e336d9e9065737f707ed511d73cef5.jpg" data-match="98%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="Ozark"
+                data-image="https://i.pinimg.com/1200x/51/aa/47/51aa479dad8736d622d35c904f16e371.jpg" data-match="95%"
+                data-rating="TV-MA" data-duration="4 Seasons"></div>
+            <div data-title="The Crown"
+                data-image="https://i.pinimg.com/736x/10/fb/be/10fbbe0bf276b7b74f1c9a1cc84ee92e.jpg" data-match="94%"
+                data-rating="TV-MA" data-duration="6 Seasons"></div>
+            <div data-title="Russian Doll"
+                data-image="https://i.pinimg.com/1200x/a7/fc/be/a7fcbe8cb46aea7378ae05f4e60a4256.jpg" data-match="87%"
+                data-rating="TV-MA" data-duration="2 Seasons"></div>
+            <div data-title="The Good Place"
+                data-image="https://i.pinimg.com/736x/b9/ee/99/b9ee993ed11b8f3e4b8d63a05d2c4bb5.jpg" data-match="91%"
+                data-rating="TV-14" data-duration="4 Seasons"></div>
+            <div data-title="Daredevil"
+                data-image="https://i.pinimg.com/1200x/09/3e/17/093e1733d5cb25d0a03b35a0dd357a1d.jpg" data-match="89%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="Jessica Jones"
+                data-image="https://i.pinimg.com/1200x/6f/32/14/6f321416a3b6f87ce28d10d07e7f7237.jpg" data-match="86%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="Luke Cage"
+                data-image="https://i.pinimg.com/736x/ab/e5/50/abe550663cf357241e52c04754440353.jpg" data-match="84%"
+                data-rating="TV-MA" data-duration="2 Seasons"></div>
+            <div data-title="BoJack Horseman"
+                data-image="https://i.pinimg.com/1200x/9f/dc/69/9fdc69965ec70d21700bdd33bdb96be5.jpg" data-match="90%"
+                data-rating="TV-MA" data-duration="6 Seasons"></div>
+            <div data-title="Atypical"
+                data-image="https://i.pinimg.com/736x/75/e2/c4/75e2c44fa1a0f5d86a4b192e60451521.jpg" data-match="88%"
+                data-rating="TV-14" data-duration="4 Seasons"></div>
+            <div data-title="Love, Death & Robots"
+                data-image="https://i.pinimg.com/1200x/f9/8b/78/f98b781f92642f87da0e0286709e2463.jpg" data-match="96%"
+                data-rating="TV-MA" data-duration="3 Volumes"></div>
+            <div data-title="Dead to Me"
+                data-image="https://i.pinimg.com/736x/52/be/cd/52becdc2ad5603d67c0c9ec7f12fdcef.jpg" data-match="89%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="The Haunting of Hill House"
+                data-image="https://i.pinimg.com/736x/82/bd/0b/82bd0b3008e779f0d92088fbac8dd5c2.jpg" data-match="91%"
+                data-rating="TV-MA" data-duration="1 Season"></div>
+            <div data-title="Never Have I Ever"
+                data-image="https://i.pinimg.com/1200x/c8/77/90/c87790ecac7fa7c08325f00a5e8975d7.jpg" data-match="88%"
+                data-rating="TV-14" data-duration="4 Seasons"></div>
+            <div data-title="Sweet Tooth"
+                data-image="https://i.pinimg.com/736x/3f/d2/f6/3fd2f6ca1dbdd91507bbc7b5a7c01e64.jpg" data-match="90%"
+                data-rating="TV-14" data-duration="2 Seasons"></div>
+            <div data-title="You" data-image="https://i.pinimg.com/736x/c2/7f/a4/c27fa447b91d34933293f37a0b2f1a89.jpg"
+                data-match="92%" data-rating="TV-MA" data-duration="4 Seasons"></div>
+        </div>
+        <div data-category="movies">
+            <div data-title="Extraction"
+                data-image="https://i.pinimg.com/736x/fb/8c/41/fb8c4189e5acb804d7ae80b853a2aa06.jpg" data-match="89%"
+                data-rating="R" data-duration="1h 56m"></div>
+            <div data-title="The Irishman"
+                data-image="https://i.pinimg.com/1200x/53/6f/c5/536fc5b4de7f8ff358b9f3f99fce2639.jpg" data-match="94%"
+                data-rating="R" data-duration="3h 29m"></div>
+            <div data-title="Bird Box"
+                data-image="https://i.pinimg.com/736x/15/d8/d8/15d8d8e5df6acd710fd018713649c751.jpg" data-match="87%"
+                data-rating="R" data-duration="2h 4m"></div>
+            <div data-title="Roma" data-image="https://i.pinimg.com/736x/e1/78/84/e17884322c5556d0a8c48e1da821ba2a.jpg"
+                data-match="91%" data-rating="R" data-duration="2h 15m"></div>
+            <div data-title="6 Underground"
+                data-image="https://i.pinimg.com/1200x/46/71/d9/4671d9c8d6ebc85aec7e95dafd5fc6cc.jpg" data-match="85%"
+                data-rating="R" data-duration="2h 8m"></div>
+            <div data-title="Triple Frontier"
+                data-image="https://i.pinimg.com/1200x/75/52/ac/7552acf228cdcd404191248c605a44ab.jpg" data-match="83%"
+                data-rating="R" data-duration="2h 5m"></div>
+            <div data-title="Enola Holmes"
+                data-image="https://i.pinimg.com/736x/a6/ec/22/a6ec224eb6550c7c385b2d81cd5c6964.jpg" data-match="88%"
+                data-rating="PG-13" data-duration="2h 3m"></div>
+            <div data-title="Red Notice"
+                data-image="https://i.pinimg.com/736x/f0/91/3e/f0913e68b2b1557a643395837493b52c.jpg" data-match="90%"
+                data-rating="PG-13" data-duration="1h 58m"></div>
+            <div data-title="Project Power"
+                data-image="https://i.pinimg.com/1200x/9b/c1/39/9bc13988133b7acfbe9e6384e975c412.jpg" data-match="86%"
+                data-rating="R" data-duration="1h 53m"></div>
+            <div data-title="Army of the Dead"
+                data-image="https://i.pinimg.com/1200x/07/08/b6/0708b6778027bc0e8e16356bfed7a7fd.jpg" data-match="84%"
+                data-rating="R" data-duration="2h 28m"></div>
+            <div data-title="Kate" data-image="https://i.pinimg.com/736x/c2/1e/44/c21e44d38a4048af9d891b3a7865bff8.jpg"
+                data-match="82%" data-rating="R" data-duration="1h 46m"></div>
+            <div data-title="Outside the Wire"
+                data-image="https://i.pinimg.com/736x/ac/8a/3a/ac8a3aefa2510ba01f558f0f9d1ec0bd.jpg" data-match="81%"
+                data-rating="R" data-duration="1h 54m"></div>
+            <div data-title="The Old Guard"
+                data-image="https://i.pinimg.com/1200x/84/ea/14/84ea148f8444ad9ca25df7e96118d919.jpg" data-match="88%"
+                data-rating="R" data-duration="2h 5m"></div>
+            <div data-title="Spenser Confidential"
+                data-image="https://i.pinimg.com/736x/2b/f2/82/2bf28283b9ec9b90247caa313cd29730.jpg" data-match="79%"
+                data-rating="R" data-duration="1h 51m"></div>
+            <div data-title="The Platform"
+                data-image="https://i.pinimg.com/736x/98/9c/38/989c38c3294176d970c6fc24ec7eb692.jpg" data-match="85%"
+                data-rating="TV-MA" data-duration="1h 34m"></div>
+            <div data-title="I Am Mother"
+                data-image="https://i.pinimg.com/1200x/2a/51/3f/2a513f3f94b043d7232efe39b3c9e2e5.jpg" data-match="83%"
+                data-rating="TV-14" data-duration="1h 53m"></div>
+            <div data-title="Okja" data-image="https://i.pinimg.com/736x/a2/ef/eb/a2efebef30d8616588d878f468d043f0.jpg"
+                data-match="86%" data-rating="TV-14" data-duration="2h 1m"></div>
+            <div data-title="The Ballad of Buster Scruggs"
+                data-image="https://i.pinimg.com/1200x/b7/ba/66/b7ba66a7101abcb868baf021982d8297.jpg" data-match="89%"
+                data-rating="R" data-duration="2h 13m"></div>
+            <div data-title="Mudbound"
+                data-image="https://i.pinimg.com/736x/72/8f/80/728f8098114b6c8a16b869aadecd2879.jpg" data-match="91%"
+                data-rating="R" data-duration="2h 14m"></div>
+            <div data-title="Beasts of No Nation"
+                data-image="https://i.pinimg.com/736x/c6/e7/1f/c6e71fb7bb1a029b777833292d88769a.jpg" data-match="87%"
+                data-rating="TV-MA" data-duration="2h 17m"></div>
+        </div>
+        <div data-category="series">
+            <div data-title="The Witcher"
+                data-image="https://i.pinimg.com/736x/39/e3/36/39e336d9e9065737f707ed511d73cef5.jpg" data-match="98%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="Ozark"
+                data-image="https://i.pinimg.com/1200x/51/aa/47/51aa479dad8736d622d35c904f16e371.jpg" data-match="95%"
+                data-rating="TV-MA" data-duration="4 Seasons"></div>
+            <div data-title="Money Heist"
+                data-image="https://i.pinimg.com/736x/11/99/e7/1199e7af4428e98189efd90b454923f5.jpg" data-match="92%"
+                data-rating="TV-MA" data-duration="5 Seasons"></div>
+            <div data-title="Dark" data-image="https://i.pinimg.com/1200x/3f/1c/ee/3f1cee950776c993b156ad3041e98a2a.jpg"
+                data-match="89%" data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="The Crown"
+                data-image="https://i.pinimg.com/736x/10/fb/be/10fbbe0bf276b7b74f1c9a1cc84ee92e.jpg" data-match="94%"
+                data-rating="TV-MA" data-duration="6 Seasons"></div>
+            <div data-title="Lucifer"
+                data-image="https://i.pinimg.com/1200x/ce/88/ca/ce88ca8a8336b07aff0aa81ce0c46e12.jpg" data-match="95%"
+                data-rating="TV-14" data-duration="6 Seasons"></div>
+            <div data-title="Narcos"
+                data-image="https://i.pinimg.com/1200x/e8/5a/85/e85a85d57bcbd412ae5530d3eade8d50.jpg" data-match="93%"
+                data-rating="TV-MA" data-duration="3 Seasons"></div>
+            <div data-title="Breaking Bad"
+                data-image="https://i.pinimg.com/1200x/37/62/75/37627587496965efcc0ae42ac9dff525.jpg" data-match="97%"
+                data-rating="TV-MA" data-duration="5 Seasons"></div>
+            <div data-title="Better Call Saul"
+                data-image="https://i.pinimg.com/736x/e9/3d/6d/e93d6d6f23bc4c7eaa6b2f1f81731e62.jpg" data-match="96%"
+                data-rating="TV-14" data-duration="6 Seasons"></div>
+            <div data-title="The Office"
+                data-image="https://i.pinimg.com/1200x/41/eb/00/41eb00ad46225e2dff55a5b40dcd459c.jpg" data-match="93%"
+                data-rating="TV-14" data-duration="9 Seasons"></div>
+            <div data-title="Friends"
+                data-image="https://i.pinimg.com/736x/1d/36/6a/1d366a6b92f4aa7e4df4fc5cacf141a3.jpg" data-match="90%"
+                data-rating="TV-14" data-duration="10 Seasons"></div>
+            <div data-title="Sherlock"
+                data-image="https://i.pinimg.com/736x/ac/da/09/acda09df027c6cdc127505bf1516cdfa.jpg" data-match="94%"
+                data-rating="TV-14" data-duration="4 Seasons"></div>
+            <div data-title="The Walking Dead"
+                data-image="https://i.pinimg.com/736x/dd/19/51/dd19514c9b8de5854d31a812f1b3cec0.jpg" data-match="85%"
+                data-rating="TV-MA" data-duration="11 Seasons"></div>
+            <div data-title="Game of Thrones"
+                data-image="https://i.pinimg.com/1200x/1f/76/ef/1f76ef325fc0c1299d40b037804d8216.jpg" data-match="89%"
+                data-rating="TV-MA" data-duration="8 Seasons"></div>
+            <div data-title="Westworld"
+                data-image="https://i.pinimg.com/736x/e9/56/71/e9567178a0103f636c36309f685f5ea3.jpg" data-match="87%"
+                data-rating="TV-MA" data-duration="4 Seasons"></div>
+            <div data-title="The Sopranos"
+                data-image="https://i.pinimg.com/736x/6f/d6/a3/6fd6a3c4abf9167e3e6c4970eab7b2e2.jpg" data-match="92%"
+                data-rating="TV-MA" data-duration="6 Seasons"></div>
+            <div data-title="Lost" data-image="https://i.pinimg.com/736x/c9/26/4d/c9264d837e2777e980c2f83966e91a6b.jpg"
+                data-match="88%" data-rating="TV-14" data-duration="6 Seasons"></div>
+            <div data-title="Prison Break"
+                data-image="https://i.pinimg.com/736x/b6/9a/f7/b69af7e33fd92a53deaa8445897fde92.jpg" data-match="86%"
+                data-rating="TV-14" data-duration="5 Seasons"></div>
+            <div data-title="Dexter"
+                data-image="https://i.pinimg.com/736x/54/9c/38/549c3846eb6c32db0f50732e93ee65a5.jpg" data-match="90%"
+                data-rating="TV-MA" data-duration="8 Seasons"></div>
+            <div data-title="House" data-image="https://i.pinimg.com/736x/aa/a8/4d/aaa84d84985d0682232e76f93b25cab4.jpg"
+                data-match="91%" data-rating="TV-14" data-duration="8 Seasons"></div>
+        </div>
+        <div data-category="documentaries">
+            <div data-title="Our Planet"
+                data-image="https://i.pinimg.com/736x/b2/98/b6/b298b67c1626973c32388caf638c4d76.jpg" data-match="95%"
+                data-rating="TV-G" data-duration="8 Episodes"></div>
+            <div data-title="Making a Murderer"
+                data-image="https://i.pinimg.com/1200x/68/10/fb/6810fb9ec2e19f67b88f1ecd70a31ff9.jpg" data-match="92%"
+                data-rating="TV-MA" data-duration="2 Seasons"></div>
+            <div data-title="Tiger King"
+                data-image="https://i.pinimg.com/736x/ab/9a/ce/ab9ace632e96c87bbbe0993099c0b2ef.jpg" data-match="89%"
+                data-rating="TV-MA" data-duration="2 Seasons"></div>
+            <div data-title="The Social Dilemma"
+                data-image="https://i.pinimg.com/1200x/71/77/18/7177187de139c1db9c469b7a09979aa6.jpg" data-match="87%"
+                data-rating="PG-13" data-duration="1h 34m"></div>
+            <div data-title="My Octopus Teacher"
+                data-image="https://i.pinimg.com/736x/5c/13/c4/5c13c4724c55ac0e3f4c7bdf2a228693.jpg" data-match="91%"
+                data-rating="G" data-duration="1h 25m"></div>
+            <div data-title="Seaspiracy"
+                data-image="https://i.pinimg.com/736x/da/4b/24/da4b2477b2d93ff1566d268a820e0fc9.jpg" data-match="88%"
+                data-rating="TV-14" data-duration="1h 30m"></div>
+            <div data-title="The Last Dance"
+                data-image="https://i.pinimg.com/736x/68/ad/ce/68adce1ac5de88a33d04ba04c96f0fda.jpg" data-match="96%"
+                data-rating="TV-14" data-duration="10 Episodes"></div>
+            <div data-title="Wild Wild Country"
+                data-image="https://i.pinimg.com/1200x/3b/43/12/3b4312112a026cb6e156ef9a907411f2.jpg" data-match="93%"
+                data-rating="TV-MA" data-duration="6 Episodes"></div>
+            <div data-title="The Keepers"
+                data-image="https://i.pinimg.com/736x/1c/bf/f7/1cbff7f73a765d071f6a4f4db9c2e324.jpg" data-match="90%"
+                data-rating="TV-MA" data-duration="7 Episodes"></div>
+            <div data-title="Blackfish"
+                data-image="https://i.pinimg.com/736x/af/f1/81/aff1819472ac3284e116656942046123.jpg" data-match="85%"
+                data-rating="PG-13" data-duration="1h 23m"></div>
+            <div data-title="Won't You Be My Neighbor?"
+                data-image="https://i.pinimg.com/1200x/a9/5b/ce/a95bcecc46e1869e985294d0d2aca5d9.jpg" data-match="94%"
+                data-rating="PG-13" data-duration="1h 34m"></div>
+            <div data-title="Free Solo"
+                data-image="https://i.pinimg.com/736x/47/67/4b/47674b76cea2d71a970915ea01ac225a.jpg" data-match="92%"
+                data-rating="PG-13" data-duration="1h 40m"></div>
+            <div data-title="The Act of Killing"
+                data-image="https://i.pinimg.com/736x/aa/35/65/aa35651fc9ff02e3c639c897490e3032.jpg" data-match="89%"
+                data-rating="NR" data-duration="2h 2m"></div>
+            <div data-title="Icarus"
+                data-image="https://i.pinimg.com/1200x/33/ca/44/33ca445339e95df5ba4aa4cbb10e4400.jpg" data-match="91%"
+                data-rating="TV-MA" data-duration="2h 1m"></div>
+            <div data-title="The Staircase"
+                data-image="https://i.pinimg.com/1200x/7d/5e/37/7d5e37d79a70fe2b64a63864ba3f5dba.jpg" data-match="88%"
+                data-rating="TV-MA" data-duration="13 Episodes"></div>
+            <div data-title="American Factory"
+                data-image="https://i.pinimg.com/736x/da/b2/9a/dab29ae917e64794038fec7f703e97c3.jpg" data-match="86%"
+                data-rating="PG-13" data-duration="1h 50m"></div>
+            <div data-title="The Great Hack"
+                data-image="https://i.pinimg.com/736x/54/66/a4/5466a48d19dcaee8b75073c910366e2e.jpg" data-match="84%"
+                data-rating="TV-MA" data-duration="1h 54m"></div>
+            <div data-title="Fyre" data-image="https://i.pinimg.com/736x/4b/10/20/4b1020fbfefadb3b1cf012154c46a9d8.jpg"
+                data-match="87%" data-rating="R" data-duration="1h 37m"></div>
+            <div data-title="The Inventor"
+                data-image="https://i.pinimg.com/736x/45/d8/64/45d8644cf8a93824f9eb26962bf39b54.jpg" data-match="83%"
+                data-rating="TV-14" data-duration="1h 59m"></div>
+            <div data-title="Knock Down the House"
+                data-image="https://i.pinimg.com/736x/06/46/83/0646839939ed6572edfc2b2ee47591a8.jpg" data-match="85%"
+                data-rating="PG" data-duration="1h 26m"></div>
+        </div>
+        <div data-category="kids">
+            <div data-title="Cocomelon"
+                data-image="https://i.pinimg.com/736x/53/7c/7b/537c7b2e87ccf1435b8e53bc0b9cc2a9.jpg" data-match="98%"
+                data-rating="TV-Y" data-duration="Multiple Seasons"></div>
+            <div data-title="Peppa Pig"
+                data-image="https://i.pinimg.com/736x/c8/ce/26/c8ce26bd8159ffa8f08840ab3f1fb423.jpg" data-match="95%"
+                data-rating="TV-Y" data-duration="8 Seasons"></div>
+            <div data-title="Paw Patrol"
+                data-image="https://i.pinimg.com/1200x/98/6a/61/986a610c38c35ec4c4bf4050350d33ee.jpg" data-match="93%"
+                data-rating="TV-Y" data-duration="9 Seasons"></div>
+            <div data-title="Bluey" data-image="https://i.pinimg.com/736x/5e/7b/3f/5e7b3f5bbe6c025aa82f55454254c41e.jpg"
+                data-match="97%" data-rating="TV-Y" data-duration="3 Seasons"></div>
+            <div data-title="Daniel Tiger's Neighborhood"
+                data-image="https://i.pinimg.com/1200x/55/0e/6e/550e6e65f3fdada6d0bda2fb19bb9d6d.jpg" data-match="94%"
+                data-rating="TV-Y" data-duration="5 Seasons"></div>
+            <div data-title="The Magic School Bus"
+                data-image="https://i.pinimg.com/1200x/9a/32/89/9a328974efd7b33d557555006b59237e.jpg" data-match="91%"
+                data-rating="TV-Y" data-duration="4 Seasons"></div>
+            <div data-title="Sesame Street"
+                data-image="https://i.pinimg.com/736x/08/43/12/0843120e9f637adfea084b8c14bf3e60.jpg" data-match="96%"
+                data-rating="TV-Y" data-duration="50+ Seasons"></div>
+            <div data-title="Dora the Explorer"
+                data-image="https://i.pinimg.com/736x/3a/d7/d2/3ad7d24226b4e32fbce359b3aec1c7a9.jpg" data-match="89%"
+                data-rating="TV-Y" data-duration="8 Seasons"></div>
+            <div data-title="SpongeBob SquarePants"
+                data-image="https://i.pinimg.com/736x/d2/b2/49/d2b2493f88da017b20b2f5ae1ad6be86.jpg" data-match="92%"
+                data-rating="TV-Y7" data-duration="13 Seasons"></div>
+            <div data-title="Avatar: The Last Airbender"
+                data-image="https://i.pinimg.com/736x/28/72/24/2872240cf0fa78a2eeb50cd5eed697f5.jpg" data-match="98%"
+                data-rating="TV-Y7" data-duration="3 Seasons"></div>
+            <div data-title="The Dragon Prince"
+                data-image="https://i.pinimg.com/1200x/53/b4/98/53b498a944a2f0f4c75213305f38f56f.jpg" data-match="90%"
+                data-rating="TV-Y7" data-duration="4 Seasons"></div>
+            <div data-title="Kipo and the Age of Wonderbeasts"
+                data-image="https://i.pinimg.com/736x/f5/e0/8f/f5e08fca4e0ee101b0d7341d694b3518.jpg" data-match="88%"
+                data-rating="TV-Y7" data-duration="3 Seasons"></div>
+            <div data-title="She-Ra and the Princesses of Power"
+                data-image="https://i.pinimg.com/736x/bc/12/3b/bc123b4efecc44fb6f184ef7d7e7cf94.jpg" data-match="91%"
+                data-rating="TV-Y7" data-duration="5 Seasons"></div>
+            <div data-title="Trollhunters"
+                data-image="https://i.pinimg.com/1200x/26/09/6b/26096ba6599146238b374e42874711d8.jpg" data-match="87%"
+                data-rating="TV-Y7" data-duration="3 Seasons"></div>
+            <div data-title="Carmen Sandiego"
+                data-image="https://i.pinimg.com/1200x/94/da/50/94da50442a9083c866fbb3e7a7b0277a.jpg" data-match="85%"
+                data-rating="TV-Y7" data-duration="4 Seasons"></div>
+            <div data-title="The Boss Baby: Back in Business"
+                data-image="https://i.pinimg.com/736x/b0/15/5d/b0155d5592db57a731690aa050cbf6c8.jpg" data-match="83%"
+                data-rating="TV-Y" data-duration="4 Seasons"></div>
+            <div data-title="Voltron: Legendary Defender"
+                data-image="https://i.pinimg.com/736x/f5/88/a6/f588a64f6cb873437a914c6cbea3e310.jpg" data-match="89%"
+                data-rating="TV-Y7" data-duration="8 Seasons"></div>
+            <div data-title="Hilda"
+                data-image="https://i.pinimg.com/1200x/69/be/39/69be3977562bfbca29e915b5a8a8c249.jpg" data-match="92%"
+                data-rating="TV-Y7" data-duration="2 Seasons"></div>
+            <div data-title="The Hollow"
+                data-image="https://i.pinimg.com/1200x/53/e2/36/53e236177db310dda3884f9caa2f6957.jpg" data-match="84%"
+                data-rating="TV-Y7" data-duration="2 Seasons"></div>
+            <div data-title="Green Eggs and Ham"
+                data-image="https://i.pinimg.com/1200x/f7/3e/98/f73e98bf261bf737ff398dc8465d7870.jpg" data-match="86%"
+                data-rating="TV-Y" data-duration="2 Seasons"></div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Content Data - will be populated from HTML
+        let contentData = {};
+
+        // Authentication and User Management
+        let currentUser = null;
+
+        // Carousel variables
+        let currentSlide = 0;
+        let carouselItems;
+        let carouselInterval;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50, // Offset (in px) from the top of the screen to trigger animations
+            });
+
+            // Parse movie data from hidden HTML div
+            parseMovieDataFromHTML();
+
+            // Hide loading screen after 2 seconds
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+
+                // Check if user is logged in
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    showPage('main-app');
+                    updateUserDisplay();
+                    populateContent();
+                    initializeCarousel(); // Initialize carousel after content is loaded
+                } else {
+                    showPage('signin-page');
+                }
+            }, 2000);
+
+            // Set up event listeners
+            setupEventListeners();
+        });
+
+        function parseMovieDataFromHTML() {
+            const movieDataHtmlDiv = document.getElementById('movie-data-html');
+            const categories = movieDataHtmlDiv.children;
+
+            for (const categoryDiv of categories) {
+                const categoryName = categoryDiv.dataset.category;
+                contentData[categoryName] = [];
+                for (const itemDiv of categoryDiv.children) {
+                    contentData[categoryName].push({
+                        title: itemDiv.dataset.title,
+                        image: itemDiv.dataset.image,
+                        match: itemDiv.dataset.match,
+                        rating: itemDiv.dataset.rating,
+                        duration: itemDiv.dataset.duration
+                    });
+                }
+            }
+        }
+
+
+        function setupEventListeners() {
+            // Authentication forms
+            document.getElementById('signin-form').addEventListener('submit', handleSignIn);
+            document.getElementById('signup-form').addEventListener('submit', handleSignUp);
+
+            // Header scroll effect
+            window.addEventListener('scroll', handleScroll);
+
+            // Close profile dropdown when clicking outside
+            document.addEventListener('click', function (event) {
+                const profileMenu = document.querySelector('.profile-menu');
+                const dropdown = document.getElementById('profile-dropdown');
+                const searchContainer = document.querySelector('.search-container');
+
+                // Close profile dropdown
+                if (!profileMenu.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+
+                // Close search input if clicking outside and it's active
+                if (!searchContainer.contains(event.target) && searchContainer.classList.contains('active')) {
+                    const searchInput = document.getElementById('search-input');
+                    searchInput.classList.remove('active');
+                    searchContainer.classList.remove('active');
+                    searchInput.value = ''; // Clear search input
+                    populateContent(); // Restore original content
+                }
+            });
+
+            // Search functionality
+            document.querySelector('.search-icon').addEventListener('click', toggleSearch);
+            document.getElementById('search-input').addEventListener('input', handleSearch);
+
+            // Add movie form submission
+            document.getElementById('add-movie-form').addEventListener('submit', handleAddMovie);
+        }
+
+        // Authentication Functions
+        function handleSignIn(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('signin-username').value;
+            const password = document.getElementById('signin-password').value;
+            const errorDiv = document.getElementById('signin-error');
+
+            // Get stored users
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showPage('main-app');
+                updateUserDisplay();
+                populateContent();
+                initializeCarousel(); // Initialize carousel after successful sign-in
+                showNotification('Welcome back, ' + user.username + '!');
+            } else {
+                errorDiv.textContent = 'Invalid username or password';
+            }
+        }
+
+        function handleSignUp(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const errorDiv = document.getElementById('signup-error');
+
+            // Validation
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Passwords do not match';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorDiv.textContent = 'Password must be at least 6 characters';
+                return;
+            }
+
+            // Check if user already exists
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (users.find(u => u.username === username)) {
+                errorDiv.textContent = 'Username already exists';
+                return;
+            }
+
+            if (users.find(u => u.email === email)) {
+                errorDiv.textContent = 'Email already registered';
+                return;
+            }
+
+            // Create new user
+            const newUser = { username, email, password };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+            showPage('main-app');
+            updateUserDisplay();
+            populateContent();
+            initializeCarousel(); // Initialize carousel after successful sign-up
+            showNotification('Account created successfully! Welcome, ' + username + '!');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showPage('signin-page');
+            showNotification('Logged out successfully');
+        }
+
+        function updateUserDisplay() {
+            if (currentUser) {
+                document.getElementById('username-display').textContent = currentUser.username;
+            }
+        }
+
+        // Page and Section Management
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionName + '-section').classList.add('active');
+
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Find the corresponding nav link and add the active class
+            const activeNavLink = document.querySelector(`.nav-link[onclick*="showSection('${sectionName}')"]`);
+            if (activeNavLink) {
+                activeNavLink.classList.add('active');
+            }
+
+            // Populate section content
+            populateSectionContent(sectionName);
+        }
+
+        // Content Population
+        function populateContent() {
+            populateRow('trending-row', contentData.trending.slice(0, 12), true);
+            populateRow('originals-row', contentData.originals.slice(0, 12));
+            populateRow('movies-row', contentData.movies.slice(0, 12));
+        }
+
+        function populateSectionContent(sectionName) {
+            switch (sectionName) {
+                case 'trending':
+                    populateRow('all-trending-row', contentData.trending);
+                    break;
+                case 'originals':
+                    populateRow('all-originals-row', contentData.originals);
+                    break;
+                case 'movies':
+                    populateRow('all-movies-row', contentData.movies);
+                    break;
+                case 'series':
+                    populateRow('all-series-row', contentData.series);
+                    break;
+                case 'documentaries':
+                    populateRow('all-documentaries-row', contentData.documentaries);
+                    break;
+                case 'kids':
+                    populateRow('all-kids-row', contentData.kids);
+                    break;
+                default:
+                    // For search results, we will populate a generic "Search Results" section
+                    // For now, if no specific section, just populate home content
+                    populateRow('trending-row', contentData.trending.slice(0, 12), true);
+                    populateRow('originals-row', contentData.originals.slice(0, 12));
+                    populateRow('movies-row', contentData.movies.slice(0, 12));
+                    break;
+            }
+        }
+
+        function createContentCard(item) {
+            return `
+        <div class="content-card" data-aos="fade-up">
+            <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x300/333333/FFFFFF?text=No+Image';">
+            <div class="card-info">
+                <h3>${item.title}</h3>
+                <div class="card-details">
+                    <span class="match">${item.match} Match</span>
+                    <span class="rating">${item.rating}</span>
+                    <span class="duration">${item.duration}</span>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Play">▶</button>
+                    <button class="card-btn" title="Add to List">+</button>
+                    <button class="card-btn" title="Like">❤︎</button>
+                    <button class="card-btn" title="More Info">ℹ</button>
+                </div>
+            </div>
+        </div>
+    `;
+        }
+
+        function populateRow(rowId, items, isHorizontal = false) {
+            const row = document.getElementById(rowId);
+            if (!row) return;
+
+            if (isHorizontal) {
+                row.classList.add('horizontal-scroll');
+            } else {
+                row.classList.remove('horizontal-scroll'); // Ensure it's removed if not horizontal
+            }
+
+            row.innerHTML = items.map(item => createContentCard(item)).join('');
+
+            // Re-initialize AOS after new content is added
+            AOS.refresh();
+        }
+
+        // UI Interaction Functions
+        function handleScroll() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }
+
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function scrollRowSmooth(rowId, direction) {
+            const row = document.getElementById(rowId);
+            if (!row) return;
+
+            const scrollAmount = row.clientWidth * 0.8; // Scroll by 80% of the row's visible width
+            const currentScroll = row.scrollLeft;
+
+            let targetScroll;
+            if (direction === 'left') {
+                targetScroll = Math.max(0, currentScroll - scrollAmount);
+            } else {
+                targetScroll = Math.min(row.scrollWidth - row.clientWidth, currentScroll + scrollAmount);
+            }
+
+            row.scrollTo({
+                left: targetScroll,
+                behavior: 'smooth'
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Search Functionality
+        function toggleSearch() {
+            const searchInput = document.getElementById('search-input');
+            const searchContainer = document.querySelector('.search-container');
+            searchInput.classList.toggle('active');
+            searchContainer.classList.toggle('active');
+            if (searchInput.classList.contains('active')) {
+                searchInput.focus();
+            } else {
+                searchInput.value = ''; // Clear search input when closing
+                populateContent(); // Restore original content when search is closed
+            }
+        }
+
+        function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const allMovies = [];
+
+            // Collect all movies from all categories
+            for (const category in contentData) {
+                allMovies.push(...contentData[category]);
+            }
+
+            const filteredMovies = allMovies.filter(movie =>
+                movie.title.toLowerCase().includes(searchTerm)
+            );
+
+            // Display search results in a dedicated section
+            const searchResultsSection = document.getElementById('trending-section'); // Reusing trending section for search results
+            const searchResultsTitle = searchResultsSection.querySelector('.row-title');
+            const searchResultsRow = document.getElementById('all-trending-row');
+
+            if (searchTerm.length > 0) {
+                showSection('trending'); // Show the trending section to display results
+                searchResultsTitle.textContent = `Search Results for "${e.target.value}"`;
+                if (filteredMovies.length > 0) {
+                    populateRow('all-trending-row', filteredMovies);
+                } else {
+                    searchResultsRow.innerHTML = '<p style="text-align: center; width: 100%; margin-top: 50px;">No results found.</p>';
+                }
+            } else {
+                // If search term is empty, restore the original trending content
+                searchResultsTitle.textContent = 'All Trending Content';
+                populateRow('all-trending-row', contentData.trending);
+            }
+        }
+
+        // Add Movie Card Functionality
+        function handleAddMovie(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('movie-title').value;
+            const image = document.getElementById('movie-image').value;
+            const match = document.getElementById('movie-match').value + '%';
+            const rating = document.getElementById('movie-rating').value;
+            const duration = document.getElementById('movie-duration').value;
+
+            const newMovie = { title, image, match, rating, duration };
+
+            // Add to a specific category, e.g., 'movies' or create a new 'user-added' category
+            if (!contentData['user-added']) {
+                contentData['user-added'] = [];
+                // Optionally, create a new section for user-added movies
+                const mainContent = document.querySelector('.main-content');
+                const userAddedSection = document.createElement('section');
+                userAddedSection.classList.add('content-row');
+                userAddedSection.setAttribute('data-aos', 'fade-up');
+                userAddedSection.innerHTML = `
+            <h2 class="row-title">Your Added Movies</h2>
+            <div class="row-container">
+                <div class="row-content" id="user-added-row"></div>
+            </div>
+        `;
+                mainContent.appendChild(userAddedSection);
+            }
+            contentData['user-added'].unshift(newMovie); // Add to the beginning
+
+            // Repopulate the relevant row
+            populateRow('user-added-row', contentData['user-added']);
+
+            // Clear form fields
+            e.target.reset();
+            showNotification(`"${title}" added to your movies!`);
+        }
+
+
+        // Video Carousel Functionality
+        function initializeCarousel() {
+            carouselItems = document.querySelectorAll('.carousel-item');
+            showSlide(currentSlide);
+            startCarouselAutoplay();
+        }
+
+        function showSlide(index) {
+            // Pause all videos first
+            document.querySelectorAll('.background-video').forEach(video => {
+                video.pause();
+                video.currentTime = 0; // Reset video to start
+            });
+
+            carouselItems.forEach((item, i) => {
+                item.classList.remove('active');
+                // Reset AOS animations for all items before setting the active one
+                item.querySelectorAll('[data-aos]').forEach(el => {
+                    el.classList.remove('aos-animate');
+                });
+            });
+
+            carouselItems[index].classList.add('active');
+            const activeVideo = carouselItems[index].querySelector('.background-video');
+            if (activeVideo) {
+                activeVideo.play();
+            }
+
+            // Re-initialize AOS for the active slide's content
+            AOS.refreshHard(); // Use refreshHard to re-calculate positions and re-animate
+        }
+
+        function changeSlide(n) {
+            currentSlide += n;
+            if (currentSlide >= carouselItems.length) {
+                currentSlide = 0;
+            } else if (currentSlide < 0) {
+                currentSlide = carouselItems.length - 1;
+            }
+            showSlide(currentSlide);
+            resetCarouselAutoplay(); // Reset autoplay timer on manual slide change
+        }
+
+        function startCarouselAutoplay() {
+            carouselInterval = setInterval(() => {
+                changeSlide(1);
+            }, 30000); // Change slide every 8 seconds
+        }
+
+        function resetCarouselAutoplay() {
+            clearInterval(carouselInterval);
+            startCarouselAutoplay();
+        }
+
+
+        // Enhanced card interactions
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add enhanced hover effects to cards
+            document.addEventListener('mouseover', function (e) {
+                if (e.target.closest('.content-card')) {
+                    const card = e.target.closest('.content-card');
+                    card.style.transform = 'scale(1.08) translateY(-10px) rotateY(5deg)';
+                }
+            });
+
+            document.addEventListener('mouseout', function (e) {
+                if (e.target.closest('.content-card')) {
+                    const card = e.target.closest('.content-card');
+                    card.style.transform = 'scale(1) translateY(0) rotateY(0deg)';
+                }
+            });
+
+            // Add click handlers for card buttons
+            document.addEventListener('click', function (e) {
+                if (e.target.classList.contains('card-btn')) {
+                    const title = e.target.closest('.content-card').querySelector('h3').textContent;
+                    const action = e.target.title;
+                    showNotification(`${action}: ${title}`);
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const dropdown = document.getElementById('profile-dropdown');
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Add notification bell functionality
+        document.querySelector('.notifications').addEventListener('click', function () {
+            showNotification('No new notifications');
+        });
+
+        // Initialize intersection observer for lazy loading
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                        observer.unobserve(img);
+                    }
+                }
+            });
+        });
+
+        // Observe all images for lazy loading
+        document.addEventListener('DOMContentLoaded', function () {
+            const images = document.querySelectorAll('img[data-src]');
+            images.forEach(img => imageObserver.observe(img));
+        });
+
+    </script>
+</body>
+
+</html>
