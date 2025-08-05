@@ -1,33 +1,33 @@
-Royz Movies 🎬
-A modern and responsive web application to browse, search, and explore movies. Built with HTML, CSS, and JavaScript, this project showcases a clean UI and smooth user experience.
+Netflix XClone
+A modern Netflix clone built with HTML, CSS, and JavaScript. Netflix XClone provides a sleek and responsive UI, allowing users to browse and search movies with a visually appealing interface.
 
 🔗 Live Demo: royz-movies.netlify.app
 
-🚀 Features
-🎥 Movie Listings – Displays popular and trending movies dynamically.
+✨ Features
+🎥 Movie Listings – Browse popular and trending movies dynamically.
 
-🔍 Search Functionality – Quickly search for movies by title.
+🔍 Search Functionality – Instantly search movies by title.
 
-🖼 Movie Details – View essential information like posters, ratings, and descriptions.
+🖼 Movie Details – Display movie posters, ratings, and descriptions.
 
-🌗 Dark/Light Mode – Switch themes for a comfortable viewing experience.
+🌗 Dark/Light Mode – Toggle between dark and light themes.
 
-📱 Fully Responsive – Optimized for mobile, tablet, and desktop.
+📱 Fully Responsive – Works seamlessly on mobile, tablet, and desktop.
 
-⚡ Fast Loading – Lightweight design with optimized performance.
+⚡ Fast Loading – Optimized for better performance.
 
 🛠️ Tech Stack
 Frontend: HTML, CSS, JavaScript
 
 Deployment: Netlify
 
-API (Optional): TMDb API (if you’re using an API)
+API (Optional): TMDb API (if used)
 
 📂 Project Structure
 bash
 Copy
 Edit
-royz-movies/
+netflix-xclone/
 │
 ├── index.html           # Main HTML file
 ├── style.css            # Stylesheet
@@ -40,46 +40,46 @@ Clone the repository:
 bash
 Copy
 Edit
-git clone https://github.com/<your-username>/royz-movies.git
+git clone https://github.com/<your-username>/netflix-xclone.git
 Navigate to the project folder:
 
 bash
 Copy
 Edit
-cd royz-movies
+cd netflix-xclone
 Open index.html in your browser
-or use a live server extension in VS Code for a better experience.
+or use a Live Server extension in VS Code for a better experience.
 
 📌 Usage
-Open the site and browse through the movie list.
+Open the site and browse movies.
 
-Use the search bar to find movies.
+Use the search bar to find specific movies.
 
-Toggle dark/light mode for UI preference.
+Toggle dark/light mode for a personalized UI.
 
-Click on a movie card to view details (if implemented).
+Click movie cards to view details (if implemented).
 
-🌟 Future Enhancements
-Add user authentication for personalized watchlists.
+🚀 Future Enhancements
+User authentication and watchlist feature.
 
-Integrate a backend for saving favorite movies.
+Advanced filters (genre, release year, ratings).
 
-Improve search with filters (genre, rating, year).
+Backend integration for saving favorites.
 
-Add pagination or infinite scrolling for better UX.
+Infinite scrolling or pagination.
 
 🤝 Contributing
 Contributions, issues, and feature requests are welcome!
 
-Fork the project.
+Fork the repository
 
-Create a new branch (feature/YourFeature).
+Create a new branch (feature/YourFeature)
 
-Commit your changes.
+Commit your changes
 
-Push to the branch.
+Push to the branch
 
-Open a pull request.
+Open a pull request
 
 📜 License
 This project is licensed under the MIT License.
